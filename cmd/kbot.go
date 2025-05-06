@@ -1,12 +1,10 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -14,7 +12,7 @@ import (
 )
 
 var (
-	appVersion = "1.0.0" // Define your application version here
+	appVersion = "1.0.3" // Define your application version here
 	Teletoken  = os.Getenv("TELE_TOKEN")
 )
 
@@ -22,13 +20,8 @@ var (
 var kbotCmd = &cobra.Command{
 	Use:     "kbot",
 	Aliases: []string{"start"},
-	Short:   "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short:   "Telegram bot for interacting with Instagram videos",
+	Long:    `A bot to download Instagram videos by providing a URL.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("kbot %s started\n", appVersion)
 
@@ -37,40 +30,48 @@ to quickly create a Cobra application.`,
 			Token:  Teletoken,
 			Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 		})
-
 		if err != nil {
 			log.Fatalf("Please check TELE_TOKEN env variable. %s", err)
 			return
 		}
 
 		kbot.Handle(telebot.OnText, func(m telebot.Context) error {
+			messageText := m.Text()
 
-			log.Print(m.Message().Payload, m.Text())
-			payload := m.Message().Payload
-
-			switch payload {
-			case "hello":
-				err = m.Send(fmt.Sprintf("Hello I'm Kbot %s!", appVersion))
+			if messageText == "/start" {
+				return m.Send(fmt.Sprintf("Hello! I'm Kbot %s.\nSend me an Instagram video URL to download.", appVersion))
 			}
 
-			return err
+			if strings.Contains(messageText, "instagram.com") {
+				log.Printf("Instagram URL received: %s", messageText)
+
+				err := m.Send("Downloading your Instagram video, please wait...")
+				if err != nil {
+					log.Printf("Failed to notify user: %v", err)
+				}
+
+				tempFile, err := DownloadInstagramVideo(messageText)
+				if err != nil {
+					log.Printf("Error downloading video: %s", err)
+					return m.Send("❌ Failed to download the video.")
+				}
+				defer os.Remove(tempFile)
+
+				video := &telebot.Video{File: telebot.FromDisk(tempFile)}
+				err = m.Send(video)
+				if err != nil {
+					log.Printf("Failed to send video: %v", err)
+					return m.Send("❌ Failed to send the video.")
+				}
+			}
+
+			return nil
 		})
 
 		kbot.Start()
-
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(kbotCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// kbotCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// kbotCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
