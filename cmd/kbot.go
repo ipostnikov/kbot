@@ -39,7 +39,7 @@ var kbotCmd = &cobra.Command{
 			messageText := m.Text()
 
 			if messageText == "/start" {
-				return m.Send(fmt.Sprintf("Hello! I'm Kbot %s.\nSend me an Instagram video URL to download.", appVersion))
+				return m.Send(fmt.Sprintf("Hello! I'm K9 Shepard Bot %s.\nSend me an Instagram video URL to download.", appVersion))
 			}
 
 			if strings.Contains(messageText, "instagram.com") {
