@@ -1,6 +1,7 @@
 
 # app name and registry
-APP := $(shell basename $(shell git remote get-url origin))
+# APP := $(shell basename $(shell git remote get-url origin))
+APP := kbot
 VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 REGISTRY := ipostnikov
 IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
