@@ -1,38 +1,72 @@
-APP=$(shell basename $(shell git remote get-url origin))
-VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
-REGISTRY=ipostnikov
-TARGETOS=linux
-TARGETARCH=arm64
+
+# app name and registry
+APP := $(shell basename $(shell git remote get-url origin))
+VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
+REGISTRY := ipostnikov
+IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
+
+# variables for build
+GOOS ?= linux
+GOARCH ?= amd64
 
 format:
-	gofmt -s -w ./
+	@echo "Formatting Go code..."
+	@gofmt -s -w ./
 
 get:
-	go get
+	@go get
 
-lint:
-	go vet ./...
-	staticcheck ./...
+install_tools:
+	@go install honnef.co/go/tools/cmd/staticcheck@latest
 
+# run vet and staticcheck
+vet:
+	@go vet ./...
+	@staticcheck ./...
+
+# run tests
 test:
-	go test -v
+	@echo "Running tests..."
+	@go test -v ./...
 
-
+# do build
 build: format get
-	CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${shell dpkg --print-architecture} go build -v -o kbot -ldflags "-X="github.com/ipostnikov/kbot/cmd.appVersion=${VERSION}
+	@echo "Building version..."
+	@CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP) -ldflags "-X=github.com/ipostnikov/kbot/cmd.appVersion=$(VERSION)"
 
+# do build specifying os and arch
+linux:
+	@echo "Building for Linux amd64..."
+	$(MAKE) build GOOS=linux GOARCH=amd64
+
+windows:
+	@echo "Building for Windows amd64..."
+	$(MAKE) build GOOS=windows GOARCH=amd64
+
+macos:
+	@echo "Building for Macos amd64..."
+	$(MAKE) build GOOS=darwin GOARCH=amd64
+
+arm64:
+	@echo "Building for ARM64..."
+	@$(MAKE) build GOOS=linux GOARCH=arm64
+
+# build docker image
 image:
-	docker build . -t ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+	@echo "Building Docker image..."
+	@docker build . -t $(IMAGE_TAG)
+
+# push docker image
 
 push:
-	docker build . -t ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+	@echo "Pushing Docker image..."
+	@docker push $(IMAGE_TAG)
 
-.PHONY: clean
+# clean artifacts
 
 clean:
-	rm -rf kbot
+	@echo "Cleaning build artifacts..."
+	@rm -rf $(APP)
+	@docker rmi $(IMAGE_TAG) || true
 
-.PHONY: tools
 
-tools:
-	go install honnef.co/go/tools/cmd/staticcheck@latest
