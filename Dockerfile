@@ -4,8 +4,9 @@ WORKDIR /go/src/app
 COPY . .
 RUN make build
 
-FROM scratch
+FROM alpine:latest
 WORKDIR /
+RUN apk add --no-cache python3 py3-pip ca-certificates curl && \
+    pip install --no-cache-dir yt-dlp
 COPY --from=builder /go/src/app/kbot .
-COPY --from=alpine:latest /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT [ "./kbot", "start" ]
