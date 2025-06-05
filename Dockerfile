@@ -7,7 +7,7 @@ RUN make build
 FROM alpine:latest
 WORKDIR /
 
-RUN apk add --no-cache python3 py3-pip ca-certificates curl && \
+RUN apk add --no-cache python3 py3-pip ca-certificates curl bash && \
     python3 -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir yt-dlp
 
