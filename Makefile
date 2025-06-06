@@ -1,14 +1,14 @@
-
 # app name and registry
 # APP := $(shell basename $(shell git remote get-url origin))
 APP := kbot
 VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 REGISTRY := ipostnikov
+TARGETARCH ?= $(shell dpkg --print-architecture)
 IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
 
 # variables for build
 GOOS ?= linux
-GOARCH ?= amd64
+GOARCH ?= $(shell dpkg --print-architecture)
 
 format:
 	@echo "Formatting Go code..."
@@ -38,24 +38,24 @@ build: format get
 # do build specifying os and arch
 linux:
 	@echo "Building for Linux amd64..."
-	$(MAKE) build GOOS=linux GOARCH=amd64
+	$(MAKE) build GOOS=linux GOARCH=amd64 TARGETARCH=amd64
 
 windows:
 	@echo "Building for Windows amd64..."
-	$(MAKE) build GOOS=windows GOARCH=amd64
+	$(MAKE) build GOOS=windows GOARCH=amd64 TARGETARCH=amd64
 
 macos:
 	@echo "Building for Macos amd64..."
-	$(MAKE) build GOOS=darwin GOARCH=amd64
+	$(MAKE) build GOOS=darwin GOARCH=amd64 TARGETARCH=amd64
 
 arm64:
 	@echo "Building for ARM64..."
-	@$(MAKE) build GOOS=linux GOARCH=arm64
+	@$(MAKE) build GOOS=linux GOARCH=arm64 TARGETARCH=arm64
 
 # build docker image
 image:
 	@echo "Building Docker image..."
-	@docker build . -t $(IMAGE_TAG)
+	@docker build . -t $(IMAGE_TAG) --build-arg TARGETARCH=$(TARGETARCH)
 
 # push docker image
 
