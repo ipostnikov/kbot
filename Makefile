@@ -3,12 +3,12 @@
 APP := kbot
 VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 REGISTRY := ipostnikov
-TARGETARCH ?= $(shell dpkg --print-architecture)
+# TARGETARCH ?= $(shell dpkg --print-architecture)
 IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
 
 # variables for build
 GOOS ?= linux
-GOARCH ?= $(shell dpkg --print-architecture)
+GOARCH ?= amd64
 
 format:
 	@echo "Formatting Go code..."
