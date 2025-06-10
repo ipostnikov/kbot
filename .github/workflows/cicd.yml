@@ -14,27 +14,33 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      - name: Set VERSION environment variable
+        run: |
+          VERSION_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0") # get the tag with fallback
+          COMMIT_SHORT_SHA=$(git rev-parse --short HEAD) # short SHA commit
+          # forming a version string using ENVs
+          echo "VERSION=$VERSION_TAG-$COMMIT_SHORT_SHA-${{ env.TARGETOS }}-${{ env.TARGETARCH }}" >> $GITHUB_ENV
 
       - name: Run test
         run: make test
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-            registry: ghcr.io
-            username: ${{ github.actor }}
-            password: ${{ secrets.GHCR_GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_GITHUB_TOKEN }}
 
       - name: Build&push
         env:
           APP: "kbot"
-          REGISTRY: ghcr.io/${{ secrets.GHCR_USERNAME }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
         run: |
           make image push \
             TARGETARCH=${{ env.TARGETARCH }} \
@@ -46,25 +52,21 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
 
-
     steps:
-
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-        token: ${{ secrets.GHCR_GITHUB_TOKEN }}
-    - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update Helm chart
       uses: mikefarah/yq@master
       with:
         cmd: yq -i '.image.tag=strenv(VERSION) | .image.arch=strenv(TARGETARCH)' helm/values.yaml
 
-    - run: |
+    - name: Commit and Push updated values.yaml
+      run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git commit -am "update version $VERSION"
+        git add helm/values.yaml
+        git commit -m "update version ${{ env.VERSION }}" || echo "No changes to commit"
         git push
-  
