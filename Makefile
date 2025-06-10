@@ -4,7 +4,7 @@ APP := kbot
 VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 REGISTRY := ghcr.io/ipostnikov
 # TARGETARCH ?= $(shell dpkg --print-architecture)
-IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
+IMAGE_TAG = $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
 
 TARGETARCH ?= amd64
 # variables for build
