@@ -27,6 +27,6 @@ jobs:
       - name: Build&push
         env:
           APP: "kbot"
-          REGISTRY: ${{ secrets.GHCR_USERNAME }}
+          REGISTRY: ghcr.io/${{ secrets.GHCR_USERNAME }}
         run: make image push
   
