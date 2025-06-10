@@ -4,7 +4,6 @@
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
-
 image:
   registry: "ghcr.io"
   repository: "ipostnikov/kbot"
@@ -12,7 +11,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "v1.3.0-e128987"
-  tag: "v1.18.0-596a0a7"
+  tag: "v1.18.0-312bfc6"
   arch: ""
 imagePullSecrets:
   - name: ghcr-secret
