@@ -5,6 +5,11 @@ on:
     paths-ignore:
       - 'helm/values.yaml'
 
+env:
+  TARGETARCH: amd64
+  TARGETOS: linux
+  CGO_ENABLED: 0
+
 jobs:
   ci:
     name: CI
@@ -31,7 +36,11 @@ jobs:
         env:
           APP: "kbot"
           REGISTRY: ghcr.io/${{ secrets.GHCR_USERNAME }}
-        run: make image push
+        run: |
+          make image push \
+            TARGETARCH=${{ env.TARGETARCH }} \
+            TARGETOS=${{ env.TARGETOS }} \
+            VERSION=${{ env.VERSION }}
 
   cd:
     name: CD
