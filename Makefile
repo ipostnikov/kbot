@@ -6,7 +6,8 @@ REGISTRY := ghcr.io/ipostnikov
 # TARGETARCH ?= $(shell dpkg --print-architecture)
 IMAGE_TAG = $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
 
-TARGETARCH ?= amd64
+TARGETOS=linux
+TARGETARCH=amd64
 # variables for build
 GOOS ?= linux
 GOARCH ?= amd64
