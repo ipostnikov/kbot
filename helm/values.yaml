@@ -11,10 +11,13 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "v1.3.0-e128987"
   tag: "v1.18.0-a9938e8"
-  arch: ""
+  arch: amd64
+  os: linux
 imagePullSecrets:
   - name: ghcr-secret
 secret:
   name: tg-secret
   key: token
   env: TELE_TOKEN
+securityContext:
+  privileged: true
