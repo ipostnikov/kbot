@@ -6,9 +6,11 @@ REGISTRY := ghcr.io/ipostnikov
 # TARGETARCH ?= $(shell dpkg --print-architecture)
 IMAGE_TAG := $(REGISTRY)/$(APP):$(VERSION)-$(TARGETARCH)
 
+TARGETARCH ?= amd64
 # variables for build
 GOOS ?= linux
 GOARCH ?= amd64
+
 
 format:
 	@echo "Formatting Go code..."
