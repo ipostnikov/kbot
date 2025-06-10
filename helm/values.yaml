@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
 image:
   registry: "ghcr.io"
   repository: "ipostnikov/kbot"
@@ -11,12 +10,10 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "v1.3.0-e128987"
-  tag: "v1.3.3"
-  arch: amd64
-
+  tag: "v1.18.0-a9938e8"
+  arch: ""
 imagePullSecrets:
   - name: ghcr-secret
-
 secret:
   name: tg-secret
   key: token
