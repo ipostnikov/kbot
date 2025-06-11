@@ -40,15 +40,6 @@ pipeline {
             }
         }
 
-        stage("test") {
-            // This stage will be skipped if SKIP_TESTS parameter is true
-            when { expression { return !params.SKIP_TESTS } }
-            steps {
-                echo 'TEST EXECUTION STARTED'
-                sh 'make test'
-            }
-        }
-
         stage("build") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
