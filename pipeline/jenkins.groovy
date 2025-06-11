@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'REPO', defaultValue: 'https://github.com/ipostnikov/kbot', description: 'GitHub repo to clone')
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Repo branch for building')
+        string(name: 'REPO', defaultValue: 'https://github.com/ipostnikov/kbot', description: 'GitHub repository to clone')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Repository branch for building')
         choice(
             name: 'OS',
             choices: ['linux', 'darwin', 'windows'],
@@ -26,24 +26,17 @@ pipeline {
         )
     }
 
-    environment {
-
-        CURRENT_REPO = params.REPO
-        CURRENT_BRANCH = params.BRANCH
-    }
-
     stages {
         stage("clone") {
             steps {
-                echo "CLONING REPOSITORY: ${CURRENT_REPO} BRANCH: ${CURRENT_BRANCH}"
-                git branch: "${CURRENT_BRANCH}", url: "${CURRENT_REPO}"
+                echo "CLONING REPOSITORY: ${params.REPO} BRANCH: ${params.BRANCH}"
+                git branch: "${params.BRANCH}", url: "${params.REPO}"
             }
         }
 
         stage("build") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
-
                 sh 'make build'
             }
         }
