@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'github'
+    }
 
     parameters {
         string(name: 'REPO', defaultValue: 'https://github.com/ipostnikov/kbot', description: 'GitHub repository to clone')
@@ -31,6 +33,14 @@ pipeline {
             steps {
                 echo "CLONING REPOSITORY: ${params.REPO} BRANCH: ${params.BRANCH}"
                 git branch: "${params.BRANCH}", url: "${params.REPO}"
+            }
+        }
+
+        stage("lint") {
+            when { expression { return !params.SKIP_LINT } }
+            steps {
+                echo 'LINT EXECUTION STARTED'
+                sh 'make lint'
             }
         }
 
