@@ -10,9 +10,11 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "v1.3.0-e128987"
-  tag: "v1.18.0-f0d36d3-linux-amd64"
+  tag: "v1.18.0-d1a501b"
   # arch: "amd64"
   # os: linux
+
+  arch: amd64
 imagePullSecrets:
   - name: ghcr-secret
 secret:
