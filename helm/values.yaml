@@ -12,7 +12,6 @@ image:
   # tag: "v1.3.0-e128987"
   tag: "v1.18.0-a403e16"
   # arch: "amd64"
-  # os: linux
 
   arch: amd64
 imagePullSecrets:
