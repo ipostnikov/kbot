@@ -33,7 +33,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}
-          image: {{ .Values.image.repository }}/{{ .Chart.Name }}:{{ .Values.image.tag }}-{{ .Values.image.arch | default "amd64" }}
+          # image: {{ .Values.image.repository }}/{{ .Chart.Name }}:{{ .Values.image.tag }}-{{ .Values.image.arch | default "amd64" }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           env:
             - name: {{ .Values.secret.env }}
               valueFrom:
