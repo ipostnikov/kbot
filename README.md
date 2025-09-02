@@ -18,11 +18,12 @@ Send an Instagram video URL to download.
 
 ## ⚙️ Requirements
 
-- Go 1.20+ installed on your system.
-- yt-dlp installed on your system.
+- Docker installed
 - A Telegram Bot Token (from [@BotFather](https://t.me/BotFather)).
 
-##  🛠️ Installation
+##  🛠️ Usage
+
+# Build using Dockerfile
 
 ### 1. Clone the repository
 
@@ -32,7 +33,6 @@ cd kbot
 ```
 ### 2. Set your environment variable
 
-
 ```bash
  read -s TELE_TOKEN 
  ```
@@ -41,16 +41,13 @@ Enter Telegram bot token
 ```bash
  export TELE_TOKEN
  ```
-
-### 3. Build
-
-```golang
-go build
+### 2. Build the image
+```sh
+docker build -t kbot:full .
 ```
-### 4. Run the bot
-
-```bash
-./kbot start
+### 3. Run the container
+```sh
+docker run -d   --name kbot_full   --env TELE_TOKEN=$TELE_TOKEN   kbot:full
 ```
 
 ## 💻 Development
@@ -64,17 +61,6 @@ go build
 
 
 
-# Build using Dockerfile (no extra installation (as yt-dlp) required)
-
-### 1. Complete steps 1 and 2 written above
-### 2. Build the image
-```sh
-docker build -t kbot:full .
-```
-### 3. Run the container
-```sh
-docker run -d   --name kbot_full   --env TELE_TOKEN=$TELE_TOKEN   kbot:full
-```
 
 ## © License
 
