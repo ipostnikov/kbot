@@ -47,7 +47,7 @@ docker build -t kbot:full .
 ```
 ### 3. Run the container
 ```sh
-docker run -d   --name kbot_full   --env TELE_TOKEN=$TELE_TOKEN   kbot:full
+docker run -d --name kbot_full --env TELE_TOKEN=$TELE_TOKEN kbot:full
 ```
 
 ## 💻 Development
