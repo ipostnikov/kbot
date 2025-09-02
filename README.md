@@ -64,6 +64,18 @@ go build
 
 
 
+# Build using Dockerfile (no extra installation (as yt-dlp) required)
+
+### 1. Complete steps 1 and 2 written above
+### 2. Build the image
+```sh
+docker build -t kbot:full .
+```
+### 3. Run the container
+```sh
+docker run -d   --name kbot_full   --env TELE_TOKEN=$TELE_TOKEN   kbot:full
+```
+
 ## © License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
