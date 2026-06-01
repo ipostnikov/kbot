@@ -5,6 +5,10 @@ on:
     paths-ignore:
       - 'helm/values.yaml'
 
+permissions:
+  contents: write
+  packages: write
+
 env:
   TARGETARCH: amd64
   TARGETOS: linux
@@ -39,15 +43,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build&push
-        env:
-          APP: "kbot"
-          REGISTRY: ghcr.io/${{ github.repository_owner }}
-        run: |
-          make image push \
-            TARGETARCH=${{ env.TARGETARCH }} \
-            TARGETOS=${{ env.TARGETOS }} \
-            VERSION=${{ env.VERSION }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/kbot:${{ env.VERSION }}-${{ env.TARGETARCH }}
+          build-args: TARGETARCH=${{ env.TARGETARCH }}
 
   cd:
     name: CD
