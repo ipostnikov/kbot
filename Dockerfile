@@ -4,21 +4,23 @@ FROM golang:1.24-alpine AS builder
 WORKDIR /go/src/app
 COPY . .
 
-RUN apk add --no-cache git make bash curl && \
-    make build && \
-    apk del git make bash curl
+RUN apk add --no-cache git make && \
+    make build
 
-# Stage 2: Final image with yt-dlp and ffmpeg
-FROM alpine:3.19
+# Stage 2: Minimal runtime
+# No ffmpeg: Instagram serves single-file MP4s and the bot requests only
+# pre-muxed formats (see downloadInstagramVideo), so no stream merging is needed.
+# yt-dlp is pure Python, so python3 is the only runtime dependency.
+FROM alpine:3.21
 
-RUN apk add --no-cache python3 ffmpeg curl ca-certificates && \
-    curl -fL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
-    chmod +x /usr/local/bin/yt-dlp && \
+RUN apk add --no-cache python3 py3-pip ca-certificates && \
+    pip3 install --no-cache-dir --break-system-packages yt-dlp && \
+    apk del py3-pip && \
+    rm -rf /root/.cache && \
     yt-dlp --version
 
 WORKDIR /app
 
-# Copy compiled Go binary
 COPY --from=builder /go/src/app/kbot .
 
 ENTRYPOINT ["./kbot", "start"]

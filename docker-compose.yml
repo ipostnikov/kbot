@@ -1,0 +1,11 @@
+services:
+  kbot:
+    build: .
+    environment:
+      - TELE_TOKEN=${TELE_TOKEN}
+      # Optional: cookies for Instagram posts that require a login.
+      - INSTAGRAM_COOKIES=${INSTAGRAM_COOKIES:-}
+    restart: unless-stopped
+    # Uncomment if you use cookies (see README):
+    # volumes:
+    #   - ./cookies.txt:/cookies.txt:ro

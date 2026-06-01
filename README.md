@@ -1,67 +1,41 @@
 # 🐾 k9_shepard_bot
 
-**k9_shepard_bot** is a simple Telegram bot built in Go that downloads Instagram videos when a user sends a reel or post URL. It uses [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) under the hood for extracting and downloading video content.
+A small Telegram bot that downloads Instagram videos. Send it a reel or
+post URL and it sends the video back. Uses [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)
+to do the actual downloading.
 
-
-##  🚀 Features
-
-**/start** - get a bot greeting
-
-Send an Instagram video URL to download. 
-
-[@k9_shepard_bot](https://t.me/k9_shepard_bot)
+Try it: [@k9_shepard_bot](https://t.me/k9_shepard_bot)
 
 <p align="center">
 <img src="usage.gif" alt="Usage example" width="600">
 </p>
 
+## Run it
 
-## ⚙️ Requirements
-
-- Docker installed
-- A Telegram Bot Token (from [@BotFather](https://t.me/BotFather)).
-
-##  🛠️ Usage
-
-# Build using Dockerfile
-
-### 1. Clone the repository
+You need Docker and a bot token from [@BotFather](https://t.me/BotFather).
 
 ```bash
 git clone https://github.com/ipostnikov/kbot.git
 cd kbot
-```
-### 2. Set your environment variable
 
-```bash
- read -s TELE_TOKEN 
- ```
-Enter Telegram bot token
-
-```bash
- export TELE_TOKEN
- ```
-### 2. Build the image
-```sh
-docker build -t kbot:full .
-```
-### 3. Run the container
-```sh
-docker run -d --name kbot_full --env TELE_TOKEN=$TELE_TOKEN kbot:full
+echo "TELE_TOKEN=your-token-here" > .env
+docker compose up -d
 ```
 
-## 💻 Development
+That's it. Logs: `docker compose logs -f`. Stop it: `docker compose down`.
 
+## Instagram cookies (optional)
 
-- **cmd/**
-    - **kbot.go** - *Contains command-line related implementations*
-    - **root.go**  - *Root command configuration*
-    - **version.go** - *Version command implementation*
-    - **instagram.go** -  *Contains logic to download Instagram videos using yt-dlp*
+Some posts require a logged-in session. If a download fails with
+"Instagram API is not granting access", give it your cookies:
 
+1. Export your Instagram cookies to `cookies.txt` (Netscape format) — the
+   "Get cookies.txt LOCALLY" browser extension works well.
+2. Put `cookies.txt` next to `docker-compose.yml`.
+3. In `docker-compose.yml`, uncomment the `volumes` block and add
+   `INSTAGRAM_COOKIES=/cookies.txt` to your `.env`.
+4. `docker compose up -d`.
 
+## License
 
-
-## © License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT — see [LICENSE](LICENSE).

@@ -22,10 +22,9 @@ jobs:
 
       - name: Set VERSION environment variable
         run: |
-          VERSION_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0") # get the tag with fallback
-          COMMIT_SHORT_SHA=$(git rev-parse --short HEAD) # short SHA commit
-          # forming a version string using ENVs
-          echo "VERSION=$VERSION_TAG-$COMMIT_SHORT_SHA-${{ env.TARGETOS }}" >> $GITHUB_ENV
+          VERSION_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
+          COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "VERSION=$VERSION_TAG-$COMMIT_SHORT_SHA" >> $GITHUB_ENV
 
       - name: Run test
         run: make test
