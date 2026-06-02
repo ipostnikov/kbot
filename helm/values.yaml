@@ -10,7 +10,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "v1.3.0-e128987"
-  tag: "v1.18.0-843c3d0"
+  tag: "v1.18.0-bef6e58"
   # arch: "amd64"
 
   arch: amd64
