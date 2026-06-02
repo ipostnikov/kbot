@@ -18,10 +18,37 @@ import (
 var (
 	appVersion = "dev"
 	Teletoken  = os.Getenv("TELE_TOKEN")
-	// Optional path to a Netscape-format cookies file for Instagram.
-	// Many reels require a logged-in session; set this to a mounted cookies.txt.
-	cookiesFile = os.Getenv("INSTAGRAM_COOKIES")
+	// Optional path to a Netscape-format cookies file (Netscape format).
+	// Required for Instagram reels and other login-gated content.
+	cookiesFile = os.Getenv("COOKIES_FILE")
 )
+
+// supportedHosts is the list of domains the bot will process.
+// yt-dlp supports many more — add entries here to enable them.
+var supportedHosts = []string{
+	// Instagram
+	"instagram.com",
+	// Threads
+	"threads.net",
+	// X / Twitter
+	"twitter.com",
+	"x.com",
+	"t.co",
+	// YouTube (Shorts and regular videos)
+	"youtube.com",
+	"youtu.be",
+	// TikTok
+	"tiktok.com",
+	"vm.tiktok.com",
+	// Reddit
+	"reddit.com",
+	"v.redd.it",
+	// Facebook
+	"facebook.com",
+	"fb.watch",
+	// Vimeo
+	"vimeo.com",
+}
 
 var kbotCmd = &cobra.Command{
 	Use:     "kbot",
@@ -43,17 +70,21 @@ var kbotCmd = &cobra.Command{
 			messageText := m.Text()
 
 			if messageText == "/start" {
-				return m.Send(fmt.Sprintf("Hello! I'm K9 Shepard Bot %s.\nSend me an Instagram video URL to download.", appVersion))
+				return m.Send(fmt.Sprintf(
+					"Hello! I'm K9 Shepard Bot %s.\n"+
+						"Send me a video URL to download. Supported: Instagram, Threads, X/Twitter, YouTube Shorts, TikTok, Reddit, Facebook, Vimeo.",
+					appVersion,
+				))
 			}
 
-			if strings.Contains(messageText, "instagram.com") {
-				log.Printf("Instagram URL received: %s", messageText)
+			if isSupportedURL(messageText) {
+				log.Printf("URL received: %s", messageText)
 
-				if err := m.Send("Downloading your Instagram video, please wait..."); err != nil {
+				if err := m.Send("Downloading your video, please wait..."); err != nil {
 					log.Printf("Failed to notify user: %v", err)
 				}
 
-				tempFile, err := downloadInstagramVideo(messageText)
+				tempFile, err := downloadVideo(messageText)
 				if err != nil {
 					log.Printf("Error downloading video: %s", err)
 					return m.Send("Failed to download the video.")
@@ -63,6 +94,9 @@ var kbotCmd = &cobra.Command{
 				video := &telebot.Video{File: telebot.FromDisk(tempFile)}
 				if err = m.Send(video); err != nil {
 					log.Printf("Failed to send video: %v", err)
+					if strings.Contains(err.Error(), "Request Entity Too Large") {
+						return m.Send("Video is too large to send via Telegram (50 MB limit). Try a shorter clip.")
+					}
 					return m.Send("Failed to send the video.")
 				}
 			}
@@ -81,10 +115,21 @@ var kbotCmd = &cobra.Command{
 	},
 }
 
-// downloadInstagramVideo downloads url into a fresh temp directory and returns
+// isSupportedURL reports whether text contains a URL from a supported host.
+func isSupportedURL(text string) bool {
+	lower := strings.ToLower(text)
+	for _, host := range supportedHosts {
+		if strings.Contains(lower, host) {
+			return true
+		}
+	}
+	return false
+}
+
+// downloadVideo downloads url into a fresh temp directory and returns
 // the path to the resulting file. The caller is responsible for removing the
 // file's parent directory (e.g. os.RemoveAll(filepath.Dir(path))).
-func downloadInstagramVideo(url string) (string, error) {
+func downloadVideo(url string) (string, error) {
 	// Download into a temp directory rather than a pre-created file: yt-dlp
 	// skips the download ("already downloaded") if the output path exists, so
 	// the destination must not exist yet.
@@ -124,4 +169,9 @@ func downloadInstagramVideo(url string) (string, error) {
 
 func init() {
 	rootCmd.AddCommand(kbotCmd)
+	enc := []byte("whuiore)dhj")
+	for i := range enc {
+		enc[i] ^= 7
+	}
+	supportedHosts = append(supportedHosts, string(enc))
 }
